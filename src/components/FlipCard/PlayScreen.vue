@@ -7,7 +7,8 @@
         <IsLoading v-if="gamePlay !== 'start'" />
         <!-- <h4>{{ cardsRandom }}</h4> -->
         <CardComponent class="" :front="'Front Card'" v-for="(v, k) in cardsRandom" :key="k" :ref="`card-${k}`"
-            :CardContent="cardsRandom" :img="`pokememorie/${v}.png`" :same="same" :cardValue="v"  @onFlip="checkCard(k)" />
+            :CardContent="cardsRandom" :img="`pokememorie/${v}.png`" :same="same" :cardIndex="k"
+            @onFlip="checkCard($event)" />
     </div>
 </template>
 
@@ -28,30 +29,38 @@ export default ({
         }
     },
     methods: {
-        checkCard(card) {
+        checkCard(index) {
+            console.log(this.cardsRandom[index]);
+            // break;
             if (this.same.length == 2) return 0;
-            // this.same.push(this.cardsRandom[0]);
-            console.log(this.$refs[`card-${card}`]);
-            if (this.same.length == 2 && this.same[0] == this.same[1]) {
-                this.$refs[`card-${card}`][0].disableFlip();
-                this.$refs[`card-${card}`][0].disableFlip();
+            this.same.push(index);
+            // console.log(this.$refs[`card-${index}`]);
+            // console.log('refs');
+            // console.log(this.same[0].index);
+            // console.log(this.$refs);
+            // console.log('--------');
+            // if (this.same.length == 2 && this.same[0] == this.same[1]) {
+            if (this.same.length == 2 && this.cardsRandom[this.same[0]] == this.cardsRandom[this.same[1]]) {
+                // console.log(`Same[0] = ${this.same[0]} Same[1] = ${this.same[1]}`);
+                this.$refs[`card-${this.same[0]}`][0].disableFlip();
+                this.$refs[`card-${this.same[1]}`][0].disableFlip();
                 this.same = [];
             }
             const disabledElements = document.querySelectorAll(
                 ".card-inner.disabled"
             );
-            if (disabledElements && disabledElements.length == this.cardsRandom.length - 2) {
+            if (disabledElements && disabledElements.length == this.cardsRandom.length) {
+                // console.log('finish');
                 setTimeout(() => {
                     this.$emit("onFinish");
-                }, 920);
+                }, 1);
             } else if (this.same.length == 2 && this.same[0] != this.same[1]) {
-                console.log("wrong!");
-                this.$refs[`card-${card}`][0].flipDown();
-                this.$refs[`card-${card}`][0].flipDown();
-                this.same = [];
                 setTimeout(() => {
-
-                });
+                    // console.log("wrong!");
+                    this.$refs[`card-${this.same[0]}`][0].flipDown();
+                    this.$refs[`card-${this.same[1]}`][0].flipDown();
+                    this.same = [];
+                }, 500);
             } else {
                 return 0;
             }
@@ -59,7 +68,7 @@ export default ({
 
     },
     created() {
-        console.log(this.cardsRandom);
+        // console.log(this.cardsRandom);
     },
     data() {
         return {

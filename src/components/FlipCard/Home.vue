@@ -22,32 +22,37 @@
                 </button>
             </div>
         </div>
-        <PlayScreen :gamePlay="gamePlay" :totalOfCard="totalOfCard" :cardsRandom="settings.cardsRandom" @onFinish="finish"
-            v-if="gamePlay == 'start'" />
-        <!-- <ResultScreen v-if="gamePlay == 'finish'" /> -->
+        <PlayScreen :gamePlay="gamePlay" :totalOfCard="totalOfCard" :cardsRandom="settings.cardsRandom"
+            @onFinish="finish" v-if="gamePlay == 'start'" />
+        <FinishScreen v-if="gamePlay == 'finish'"  @onPlayAgain="PlayAgain" :timeSecondsPlay="timeSecondsPlay" :timeMinutesPlay="timeMinutesPlay" />
     </div>
 </template>
 
 <script>
 import PlayScreen from "./PlayScreen.vue"
+import FinishScreen from "./FinishScreen.vue"
+
 import { ramdomArr } from "./utils/traits";
 export default ({
     name: 'HomeFlipCard',
 
     components: {
         PlayScreen,
+        FinishScreen,
     },
 
     data() {
         return {
             gamePlay: 'choose',
             // gamePlay: 'start',
+            // gamePlay: 'finish',
             settings: {
                 totalOfCard: 0,
                 cardsRandom: [],
                 timeStarted: null,
             },
-            timePlay: 0,
+            timeMinutesPlay: 0,
+            timeSecondsPlay: 0,
         }
     },
     methods: {
@@ -66,13 +71,24 @@ export default ({
             const cards = [...fistListCards, ...secondCards];
             this.settings.cardsRandom = ramdomArr(ramdomArr(cards));//x2
             this.settings.timeStarted = new Date().getTime();
+            console.log(this.settings.timeStarted);
             this.gamePlay = 'start';
         },
+        PlayAgain() {
+            this.gamePlay = 'choose';
+            this.settings.cardsRandom = 0
+            this.settings.totalOfCard = 0
+            this.settings.timeStarted = 0
+        },
+        finish() {
+            let total =  new Date().getTime() - (this.settings.timeStarted) 
+            this.timeMinutesPlay = Math.floor(total / (1000 * 60));
+            this.timeSecondsPlay = Math.floor((total % (1000 * 60)) / 1000);
+            this.gamePlay = 'finish';
+        }
     },
 
-    finish() {
-        console.log('finish');
-    }
+
 })
 </script>
 <style scoped>
